@@ -22,13 +22,17 @@ WeightServer::WeightServer(std::string &wserverFile, std::string &myPrIpFile, st
         parseNodeConfig(configFile, wserverFile, myPrIpFile, gserverFile);
     setupSockets();
     // Read the dsh file to get info about all weight server nodes.
+    std::cout << "initWServerComm start" << std::endl;
     initWServerComm(allNodeIps);
-
+    std::cout << "initWServerComm done" << std::endl;
     createOutputFile(tmpFile);
-
+    std::cout << "create output file" << std::endl;
     // Read in layer configurations and initialize weight matrices.
     initWeights();
+    std::cout << "initWeight all good" << std::endl;
     initAdamOpt(adam);
+    std::cout << "end of the call" << std::endl;
+
 }
 
 WeightServer::~WeightServer() {
@@ -322,6 +326,8 @@ WeightServer::initWServerComm(std::vector<std::string> &allNodeIps) {
         serverLog("Initializing nodes...");
 
     std::string myIp = allNodeIps[nodeId];
+    myIp = "127.0.0.1";
+    std::cout << myIp << std::endl;
     // Everyone needs to bind to a publisher socket.
     // Need to use the private IP because of port restrictions.
     char hostPort[50];
@@ -399,7 +405,7 @@ std::vector<std::string> WeightServer::parseNodeConfig(std::string &configFile, 
             fprintf(stderr, "[ERROR] Cannot open layer configuration file: %s [Reason: %s]\n", configFile.c_str(), std::strerror(errno));
 
         assert(infile.good());
-
+        std::cout << "491 start" << std::endl;
         // Loop through each line.
         std::string line;
         while (!infile.eof()) {
@@ -412,6 +418,7 @@ std::vector<std::string> WeightServer::parseNodeConfig(std::string &configFile, 
 
         // Assert there is at least one layer (input -> output).
         assert(dims.size() > 1);
+        std::cout << "491 end " << std::endl;
     }
 
     std::vector<std::string> allNodeIps;
@@ -427,8 +434,9 @@ std::vector<std::string> WeightServer::parseNodeConfig(std::string &configFile, 
         std::ifstream dshFile(wserverFile);
         std::string line, masterIp;
         while (std::getline(dshFile, line)) {
-            boost::algorithm::trim(line);
-            if (line.length() > 0) {
+           boost::algorithm::trim(line);
+	   std::cout << "find" << std::endl;  
+           if (line.length() > 0) {
                 std::string ip = line.substr(line.find('@') + 1);
 
                 // Set first node in file as master.
@@ -489,10 +497,13 @@ std::vector<std::string> WeightServer::parseNodeConfig(std::string &configFile, 
  */
 void
 WeightServer::initWeights() {
-    weightsStore.resize(dims.size() - 1);
-    wMtxs.resize(dims.size() - 1);
-    uMtxs.resize(dims.size() - 1);
-
+    std::cout << "size is "<< dims.size() << std::endl;
+    if (dims.size() > 0) {
+   	 weightsStore.resize(dims.size() - 1);
+   	 wMtxs.resize(dims.size() - 1);
+    	uMtxs.resize(dims.size() - 1);
+    }    
+    std::cout << "second entry" << std::endl;
     // If master node, initialize the weight matrices according to the layer config.
     if (nodeId == 0) {
         switch (gnn_type) {
@@ -984,6 +995,7 @@ void WeightServer::freeAdamOpt() {
 void WeightServer::createOutputFile(std::string &fileName) {
     // Set output file name.
     fileName += std::to_string(nodeId);
+    std::cout << "file name is " << fileName << std::endl;
     outfile.open(fileName, std::fstream::out);
     assert(outfile.good());
 }

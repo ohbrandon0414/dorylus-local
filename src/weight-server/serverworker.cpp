@@ -28,7 +28,7 @@ ServerWorker::~ServerWorker() {
  */
 void
 ServerWorker::work() {
-    // std::cout << "[ Weight ] Starts listening for lambdas' requests..." << std::endl;
+    std::cout << "[ Weight ] Starts listening for lambdas' requests..." << std::endl;
     try {
         while (true) {
             zmq::message_t identity;

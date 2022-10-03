@@ -5,7 +5,7 @@
 ##
 
 
-cd ${HOME}/dorylus/
+cd /dorylus/
 
 build_type="Release"
 for var in "${@}"; do

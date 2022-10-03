@@ -628,8 +628,8 @@ void Engine::verticesPushOut(unsigned receiver, unsigned totCnt,
                            totCnt);
     char *msgPtr = (char *)(msg.data());
     sprintf(msgPtr, NODE_ID_HEADER, receiver);
-    msgPtr += NODE_ID_DIGITS;
-    unsigned featLayer;
+    msgPtr += NODE_ID_DIGITS;;
+    unsigned int featLayer=0;
     if (gnn_type == GNN::GCN) { // YIFAN: fix this
         featLayer = c.dir == PROP_TYPE::FORWARD
                   ? c.layer : c.layer - 1;

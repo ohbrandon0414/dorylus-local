@@ -4,7 +4,7 @@
 #include <chrono>
 #include <thread>
 #include <vector>
-#include <zmq.hpp>
+#include "../../common/zmq.hpp"
 
 #include "../../common/matrix.hpp"
 #include "../../common/utils.hpp"

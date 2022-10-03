@@ -7,7 +7,7 @@
 ## Output is located in `inputs/data` folder. The dataset inside is ready to be used as our system's input.
 ##
 
-
+cd /dorylus/inputs
 if [ ! $# == 8 ]; then
     echo "Usage: $0 <GraphFile> <Undirected? (0/1)> <NumVertices> <NumPartitions> <FeaturesFile> <DimFeatures> <LabelsFile> <LabelKinds>"
     exit

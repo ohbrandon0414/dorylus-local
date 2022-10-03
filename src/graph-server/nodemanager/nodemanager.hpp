@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <zmq.hpp>
+#include "../../common/zmq.hpp"
 
 
 class Engine;

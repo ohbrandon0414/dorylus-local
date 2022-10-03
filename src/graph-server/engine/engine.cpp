@@ -71,7 +71,7 @@ void Engine::init(int argc, char *argv[]) {
     }
     graph.init(graphFile);
     printGraphMetrics();
-
+    std::cout << "after printing metrics" << std::endl;
     for (unsigned i = 0; i < 2 * numLayers; i++) {
         vecTimeAggregate.push_back(0.0);
         vecTimeApplyVtx.push_back(0.0);
@@ -80,11 +80,11 @@ void Engine::init(int argc, char *argv[]) {
         vecTimeLambdaInvoke.push_back(0.0);
         vecTimeLambdaWait.push_back(0.0);
     }
-
+    std::cout << "after for loop" << std::endl;
     // Save intermediate tensors during forward phase for backward computation.
     savedNNTensors.resize(numLayers + 1);
     savedEdgeTensors.resize(numLayers + 1);
-
+    std::cout << "after resize" << std::endl;
     // Track the number of chunks finished at each epoch;
     if (staleness != UINT_MAX) {
         nodesFinishedEpoch.resize(staleness + 1);

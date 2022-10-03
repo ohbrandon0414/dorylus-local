@@ -49,7 +49,6 @@ endif()
 # Weight server.
 if(BUILD_WEIGHT)
     message("Weight server: YES")
-    add_subdirectory(src/common)
     add_subdirectory(src/weight-server ${PROJECT_SOURCE_DIR}/build/weight-server)
 else()
     message("Weight server: NO")

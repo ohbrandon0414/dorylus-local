@@ -6,7 +6,7 @@ import argparse
 def launch_ec2_instances(input_args):
 	ec2 = boto3.resource('ec2')
 	instances = []
-
+	print("launch ec2 being used")
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--ami', type=str)
 	parser.add_argument('--type', type=str)

@@ -18,7 +18,7 @@
 #include <map>
 #include <mutex>
 
-#include <zmq.hpp>
+#include "../common/zmq.hpp"
 #include <boost/algorithm/string/trim.hpp>
 
 #include "AdamOptimizer.hpp"

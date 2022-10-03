@@ -9,12 +9,14 @@ def set_pub_ip(ec2_cli, instance):
     """
     Set public ip for an instance.
     """
-
+    
+    """
     if instance.pub_ip == '0':  # Previously no pubip, so query again for now.
         response = ec2_cli.describe_instances(InstanceIds=[instance.id])['Reservations'][0]['Instances'][0]
         if response['State']['Name'] == "running" and 'PublicIpAddress' in response:
             instance.pub_ip = response['PublicIpAddress']
-
+    """
+    instance.pub_ip = "127.0.0.1"
     return instance
 
 

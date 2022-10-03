@@ -3,7 +3,8 @@
 #include <cassert>
 #include "dataloader.hpp"
 #include "../../common/utils.hpp"
-
+#include <exception>
+#include <type_traits>
 
 DataLoader::DataLoader(std::string datasetDir, unsigned _nodeId, unsigned _numNodes, bool _undirected) :
                         graphFile(datasetDir + RAWGRAPH_EXT + EDGES_EXT), partsFile(datasetDir + RAWGRAPH_EXT + PARTS_EXT),
@@ -92,6 +93,7 @@ void DataLoader::readPartsFile() {
  *
  */
 void DataLoader::processEdge(unsigned &from, unsigned &to) {
+    std::cout << "entered process Edge" << std::endl;
     if (rawGraph.getVertexPartitionId(from) == nodeId) {
         unsigned lFromId = rawGraph.globalToLocalId[from];
         unsigned toId;
@@ -99,26 +101,40 @@ void DataLoader::processEdge(unsigned &from, unsigned &to) {
 
         unsigned toPartition = rawGraph.getVertexPartitionId(to);
         if (toPartition == nodeId) {
-            toId = rawGraph.globalToLocalId[to];
+            std::cout << "if" << std::endl;
+	    toId = rawGraph.globalToLocalId[to];
             eLocation = LOCAL_EDGE_TYPE;
         } else {
+	    std::cout << "else" << std::endl;
             toId = to;
             eLocation = REMOTE_EDGE_TYPE;
             rawGraph.getVertex(lFromId).setVertexLocation(BOUNDARY_VERTEX);
-
+            std::cout << "temp" << std::endl;
             if (!rawGraph.containsOutEdgeGhostVertex(to)) {
                 rawGraph.getOutEdgeGhostVertices()[to] = GhostVertex();
             }
+	    std::cout << "temp2" << std::endl;
             rawGraph.getOutEdgeGhostVertex(to).addAssocEdge(lFromId);
-
-            forwardDstTables[toPartition][lFromId] = true;
+            std::cout << toPartition << ", " << lFromId<< std::endl;
+            std::cout << sizeof(forwardDstTables) << ", " << sizeof(forwardDstTables[0]) << "," << sizeof(forwardDstTables[0][0]) << std::endl;
+	    for (int i = 0; i < 1; i++) {
+		for (int j = 0; j < sizeof(forwardDstTables[0]); j++) {
+			std::cout << i << true << j << std::endl;
+}
+}
+	std::cout << "we got" <<  std::extent<decltype(forwardDstTables), 0>::value << ", " << std::extent<decltype(forwardDstTables), 1>::value << std::endl;
+ //std::cout <<"We are here: "  << (forwardDstTables[0][0]) << std::endl;
+		std::cout << forwardDstTables << std::endl;
+//	    forwardDstTables[toPartition][lFromId] = true;
+ 	    std::cout << "temp3" << std::endl;
         }
-
+        std::cout << "temp4"<< std::endl;
         rawGraph.getVertex(lFromId)
                 .addOutEdge(OutEdge(toId, eLocation, EdgeType()));
-        rawGraph.incrementNumLocalOutEdges();
+        std::cout << "temp5" << std::endl;
+	 rawGraph.incrementNumLocalOutEdges();
     }
-
+    std::cout << "out of first if" << std::endl;
     if (rawGraph.getVertexPartitionId(to) == nodeId) {
         unsigned lToId = rawGraph.globalToLocalId[to];
         unsigned fromId;
@@ -227,7 +243,7 @@ void DataLoader::preprocess() {
 
     // Read in the partition file.
     readPartsFile();
-
+    std::cout << "after readparts" << std::endl;
     // Initialize the graph based on the partition info.
     rawGraph.getVertices().resize(rawGraph.getNumLocalVertices());
     for (unsigned i = 0; i < rawGraph.getNumLocalVertices(); ++i) {
@@ -236,19 +252,19 @@ void DataLoader::preprocess() {
         rawGraph.getVertex(i).setVertexLocation(INTERNAL_VERTEX);
         rawGraph.getVertex(i).setGraphPtr(&rawGraph);
     }
-
+    std::cout << "240" << std::endl;
     // Read in the binary snap edge file.
     std::ifstream infile(graphFile.c_str(), std::ios::binary);
     if (!infile.good())
         printLog(nodeId, "Cannot open BinarySnap file: %s", graphFile.c_str());
 
     assert(infile.good());
-
     BSHeaderType bSHeader;
     infile.read((char *)&bSHeader, sizeof(bSHeader));
     assert(bSHeader.sizeOfVertexType == sizeof(unsigned));
 
     forwardDstTables = new bool *[numNodes];
+    std::cout << "num of nodes " << nodeId << ", "  << numNodes << ", " << rawGraph.getNumLocalVertices() << std::endl;
     backwardDstTables = new bool *[numNodes];
     for (unsigned i = 0; i < numNodes; ++i) {
         if (i == nodeId) {
@@ -261,19 +277,22 @@ void DataLoader::preprocess() {
         memset(backwardDstTables[i], 0,
                      sizeof(bool) * rawGraph.getNumLocalVertices());
     }
-
-    // Loop through all edges and process them.
+    std::cout << "260" << std::endl;
+    std::cout << "forwardtable " << std::extent<decltype(forwardDstTables), 0>::value << std::endl;
+   // Loop through all edges and process them.
     unsigned srcdst[2];
     while (infile.read((char *)srcdst, bSHeader.sizeOfVertexType * 2)) {
         if (srcdst[0] == srcdst[1])
             continue;
-
+        std::cout << "before processedge" << std::endl;
         processEdge(srcdst[0], srcdst[1]);
         if (undirected)
             processEdge(srcdst[1], srcdst[0]);
+        std::cout << "after process edge" << std::endl;
         rawGraph.incrementNumGlobalEdges();
+	std::cout << "break" << std::endl;
     }
-
+    std::cout << "270" << std::endl;
     for (unsigned i = 0; i < numNodes; ++i) {
         if (i == nodeId) {
             continue;
@@ -299,7 +318,7 @@ void DataLoader::preprocess() {
     delete[] backwardDstTables;
     forwardDstTables = NULL;
     backwardDstTables = NULL;
-
+    std::cout << "300" << std::endl;
     infile.close();
 
     // Extra works added.

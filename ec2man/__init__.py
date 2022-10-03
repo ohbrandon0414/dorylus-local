@@ -42,15 +42,17 @@ help_str = ("Usage: python3 -m ec2man help\n"
             "and a line of profile name to use. Also create a 'machines' file `ec2man/machines` which contains all the infos "
             "needed for setting up your instances.")
 
-
+"""
 # Read in the profile info.
 if not os.path.isfile(EC2_DIR + "profile"):
     print("ERROR: Not providing a `profile` file in the module directory.")
     exit(1)
-
+"""
 profile_name = ''
 user_name = ''
+ssh_key = ''
 region = 'us-east-2'
+"""
 with open(EC2_DIR + "profile", 'r') as fprofile:
     profile_name = fprofile.readline().strip().split()[0]
     if profile_name.lower() == 'default':   # If given as default, then set to None so that boto3 session uses the default profile.
@@ -60,10 +62,10 @@ with open(EC2_DIR + "profile", 'r') as fprofile:
     ssh_key = fprofile.readline().strip().split()[0]
     region = fprofile.readline().strip()
 
-
+"""
 # Initialize the EC2 client.
-boto3.setup_default_session(profile_name=profile_name)
-ec2_cli = boto3.client('ec2', region_name=region)
+boto3.setup_default_session(profile_name=None)
+ec2_cli = boto3.client('ec2', region_name='us-east-2')
 
 
 def process_setup(machine_list = 'machines'):
@@ -89,13 +91,15 @@ def process_setup(machine_list = 'machines'):
 
     # For every context, get its instances' info through its id_list. Create the context object, and dump
     # into a binary context file.
+    """
     for role in contexts:
         instances = get_instances_info(list(contexts[role].keys()))
         for inst in instances:
             inst.set_user_key(contexts[role][inst.id])
         ctx = Context(role, instances)
         pickle.dump(ctx, open(CTX_DIR + role + ".context", 'wb'))
-
+    """
+    pickle.dump(Context("weight", []), open(CTX_DIR + "weight" + ".context", 'wb'))
 
 def get_instances_info(id_list):
     """
@@ -231,7 +235,7 @@ def main(args):
 
     ctx_name, target = args[1], args[2]
     ctx_filename = CTX_DIR + ctx_name + ".context"
-
+    print(ctx_filename)
     # Commands all require a corresponding context.
     if not os.path.isfile(ctx_filename):
         show_error("Context for '" + ctx_name + "' not found. Please do proper `setup` first.")

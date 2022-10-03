@@ -5,7 +5,7 @@
 #include <set>
 #include <vector>
 #include <climits>
-#include <zmq.hpp>
+#include "../../common/zmq.hpp"
 #include "../parallel/lock.hpp"
 #include "../utils/utils.hpp"
 #include "../nodemanager/nodemanager.hpp"

@@ -16,6 +16,7 @@
 int main(int argc, char *argv[]) {
     // Initialize the engine.
     // The engine object is static and has been substantiated in Engine.cpp.
+    std::cout << "graph server entry" << std::endl;
     engine.init(argc, argv);
     unsigned numEpochs = engine.getNumEpochs();
     unsigned valFreq = 1;
@@ -36,6 +37,6 @@ int main(int argc, char *argv[]) {
 
     // Destroy the engine.
     engine.destroy();
-
+    std::cout << "graph server done" << std::endl;
     return 0;
 }

@@ -1,0 +1,8 @@
+# Example labels file for the above graph, with output dimension = 4 (so labels can only be 0 - 3).
+0
+3
+2
+1
+2
+3
+

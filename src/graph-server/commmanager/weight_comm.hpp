@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <string>
-#include <zmq.hpp>
+#include "../../common/zmq.hpp"
 
 class WeightComm {
 public:

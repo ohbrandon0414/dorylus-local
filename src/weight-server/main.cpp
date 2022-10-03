@@ -24,7 +24,7 @@ main(int argc, char *argv[]) {
     std::string gnn_name = std::string(argv[12]);
     float learning_rate = std::atof(argv[13]);
     float switch_threshold = std::atof(argv[14]);
-
+    std::cout << tmpFile << std::endl;
     GNN gnn_type;
     if (gnn_name == "GCN") { // GCN or GAT
         gnn_type = GNN::GCN;
@@ -45,7 +45,7 @@ main(int argc, char *argv[]) {
     // Run in a detached thread because so that we can wait
     // on a condition variable.
     ws.run();
-
+    std::cout << myPrIpFile << tmpFile << std::endl; 
     // Wait for one of the threads to mark the finished bool true
     // then end the main thread.
     std::unique_lock<std::mutex> lk(ws.termMtx);

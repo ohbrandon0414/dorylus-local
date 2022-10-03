@@ -1,0 +1,8 @@
+#! /bin/bash
+
+WEIGHTSERVER={{user}}@{{WSERVER0}}
+GRAPHSERVER={{user}}@{{GSERVER0}}
+
+cd ${HOME}
+dsh -m ${GRAPHSERVER} "./dorylus/run/kill-zombies graph"
+dsh -m ${WEIGHTSERVER} "./dorylus/run/kill-zombies weight"

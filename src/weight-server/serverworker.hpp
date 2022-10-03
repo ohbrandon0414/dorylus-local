@@ -15,7 +15,7 @@
 #include <thread>
 #include <vector>
 #include <mutex>
-#include <zmq.hpp>
+#include "../common/zmq.hpp"
 #include <boost/algorithm/string/trim.hpp>
 
 #include "weighttensor.hpp"

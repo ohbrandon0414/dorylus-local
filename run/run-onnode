@@ -32,15 +32,15 @@ case $1 in
             exit
         fi
 
-        GPORT=$( < ../gserverport )
-        WPORT=$( < ../wserverport)
+        GPORT=$( < $HOME/dorylus/run/gserverport )
+        WPORT=$( < $HOME/dorylus/run/wserverport)
 
-        DATAPORT=$( < ../dataport )
-        CTRLPORT=$( < ../ctrlport )
-        NODEPORT=$( < ../nodeport )
+        DATAPORT=$( < $HOME/dorylus/run/dataport )
+        CTRLPORT=$( < $HOME/dorylus/run/ctrlport )
+        NODEPORT=$( < $HOME/dorylus/run/nodeport )
         WSERVERIP=$HOME/wserverip
 
-        NUM_LAMBDAS=$( < ../numlambdasforward )
+        NUM_LAMBDAS=1
 
         # Minor options.
         UNDIRECTED=0           # Currently are all directed graphs.
@@ -110,7 +110,7 @@ case $1 in
         fi
 
         MYPRIPFILE=${HOME}/myprip
-        DSHMACHINESFILE=${HOME}/dshmachines
+        DSHMACHINESFILE=/etc/dsh/machines.list
 
         # Kill running graphservers.
         echo -e "\e[33;1mKilling existing 'graphserver' processes...\e[0m"
@@ -118,7 +118,11 @@ case $1 in
 
         # Count the machines.
         NDS=$( wc -l ${DSHMACHINESFILE} | cut -d" " -f1 )
+	echo "___"
+	echo ${NDS}
         for i in $( seq 1 ${NDS} ); do
+	  echo ${i}
+	  echo "iot was" 
           DSHNODES[$i]=$( head -n $i ${DSHMACHINESFILE} | tail -n 1 )
         done
 
@@ -149,9 +153,10 @@ case $1 in
         # Set temporary directory.
         TMPFILEDIR=${HOME}/tmpfiles
         dsh -f ${DSHMACHINESFILE} -c "rm -rf ${TMPFILEDIR} && mkdir -p ${TMPFILEDIR}"
-
+	echo "WE have the"
+	echo "$(pwd)"
         # Run the command on all dsh machines.
-        DSH_COMMAND="./build/graphserver \
+        DSH_COMMAND="./build/graph-server/graphserver \
             --datasetdir ${DATASET}/parts_${NDS}/ \
             --featuresfile ${DATASET}/features.bsnap \
             --labelsfile ${DATASET}/labels.bsnap \
@@ -179,7 +184,7 @@ case $1 in
             --timeout_ratio ${TO_RATIO}"
         echo ${DSH_COMMAND}
         dsh -f ${DSHMACHINESFILE} -c "cd ${HOME}/dorylus && ${DSH_COMMAND}" 2>&1 | tee ${LOGFILE}
-
+	echo "here"
 
         # Gather the output files.
         OUTFILEDIR=${HOME}/outfiles/${RUN_MARK}.$2
@@ -195,7 +200,7 @@ case $1 in
           echo -e "\e[92;1mThis round of execution seems successful, congrats ;)\e[0m"
         else
           echo -e "\e[91;1mExecution fails (at least on this node), check the log file!\e[0m"
-          ~/kill-all
+          ~/dorylus/kill-all
         fi
         ;;
 
@@ -208,12 +213,12 @@ case $1 in
             exit
         fi
 
-        WPORT=$( < ../wserverport )
-        GPORT=$( < ../gserverport )
-        DATAPORT=$( < ../dataport )
+        WPORT=$( <${HOME}/dorylus/run/wserverport )
+        GPORT=$( < ${HOME}/dorylus/run/gserverport )
+        DATAPORT=$( < ${HOME}/dorylus/run/dataport )
 
         MYPRIPFILE=${HOME}/myprip
-        DSHMACHINESFILE=${HOME}/dshmachines
+        DSHMACHINESFILE=/etc/dsh/machines.list
         GSERVERFILE=${HOME}/gserverip
         LAYERCONFIGFILE=${HOME}/$2.config
 
@@ -272,7 +277,7 @@ case $1 in
         dsh -f ${DSHMACHINESFILE} -c "rm -rf ${TMPFILEDIR} && mkdir -p ${TMPFILEDIR}"
 
         # Run weightserver on all dsh machines.
-        DSH_COMMAND="./build/weightserver \
+        DSH_COMMAND="./build/weight-server/weightserver \
             ${DSHMACHINESFILE} \
             ${MYPRIPFILE} \
             ${GSERVERFILE} \
@@ -290,7 +295,7 @@ case $1 in
 
         echo ${DSH_COMMAND}
         dsh -f ${DSHMACHINESFILE} -c "cd ${HOME}/dorylus && ${DSH_COMMAND}"
-
+	echo "after"
         # Gather the output files.
         OUTFILEDIR=${HOME}/outfiles/${RUN_MARK}.weights
         mkdir -p ${OUTFILEDIR}
